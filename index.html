@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KH Asas Masakan - Padankan Minuman Berkhasiat</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for winning animation -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Fredoka & Plus Jakarta Sans for friendly primary school look -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f0fdf4 50%, #fef3c7 100%);
+            min-height: 100vh;
+        }
+        .font-kids {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+        .draggable-item {
+            touch-action: none;
+            user-select: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+        .draggable-item:hover {
+            transform: translateY(-3px) scale(1.02);
+        }
+        .draggable-item.selected {
+            ring: 4px solid #3b82f6;
+            transform: scale(1.05);
+            box-shadow: 0 12px 20px rgba(59, 130, 246, 0.3);
+        }
+        .drop-zone {
+            transition: all 0.2s ease;
+        }
+        .drop-zone.drag-over {
+            background-color: #dbeafe !important;
+            border-color: #2563eb !important;
+            transform: scale(1.02);
+        }
+        .drop-zone.correct {
+            background-color: #dcfce7 !important;
+            border-color: #16a34a !important;
+        }
+        .drop-zone.wrong {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+        .pulse-timer {
+            animation: pulse-red 1s infinite alternate;
+        }
+        @keyframes pulse-red {
+            0% { color: #dc2626; transform: scale(1); }
+            100% { color: #991b1b; transform: scale(1.1); }
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12 min-h-screen flex flex-col justify-between">
+
+    <div>
+        <header class="bg-white/80 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-orange-500 flex items-center justify-center text-white text-2xl shadow-md font-bold font-kids">
+                        🥤
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold font-kids text-slate-800 leading-tight">KH Asas Masakan</h1>
+                        <p class="text-xs md:text-sm font-semibold text-emerald-600">Tajuk: Minuman Berkhasiat</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Action Buttons -->
+                <div class="flex items-center space-x-2">
+                    <button id="btnStudyTab" onclick="switchTab('study')" class="px-4 py-2 rounded-xl text-sm font-bold bg-sky-500 text-white shadow-md hover:bg-sky-600 transition">
+                        📖 Mod Belajar
+                    </button>
+                    <button id="btnGameTab" onclick="switchTab('game')" class="px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-white shadow-md hover:bg-amber-600 transition">
+                        ⚡ Cabaran 1 Minit
+                    </button>
+                    <button onclick="downloadGameOffline()" class="px-4 py-2 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-md hover:bg-emerald-700 transition flex items-center gap-1.5" title="Muat turun fail game untuk dimainkan offline">
+                        <span>📥</span> <span class="hidden sm:inline">Muat Turun</span> Game
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto px-4 mt-6">
+
+            <!-- TAB 1: MOD BELAJAR -->
+            <section id="studySection" class="block space-y-6">
+                <div class="bg-white rounded-3xl p-6 card-shadow border border-sky-100">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <span class="px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-bold uppercase tracking-wide">Penerangan Matapelajaran</span>
+                            <h2 class="text-2xl font-bold font-kids text-slate-800 mt-1">Kenali Minuman Berkhasiat</h2>
+                            <p class="text-slate-600 text-sm mt-1">Sila amati dan pelajari jenis-jenis minuman berkhasiat di bawah sebelum memulakan permainan cabaran.</p>
+                        </div>
+                        <button onclick="switchTab('game')" class="px-6 py-3 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-bold rounded-2xl shadow-lg hover:from-emerald-600 hover:to-teal-700 transition transform hover:-translate-y-0.5 text-center">
+                            Mula Cabaran Sekarang 🚀
+                        </button>
+                    </div>
+
+                    <!-- Study Cards Grid -->
+                    <div id="studyGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+                        <!-- Populated by JavaScript dynamically -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: MOD PERMAINAN (CABARAN 1 MINIT) -->
+            <section id="gameSection" class="hidden space-y-6">
+                <!-- Status & Control Bar -->
+                <div class="bg-white rounded-3xl p-5 card-shadow border border-amber-100 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-6">
+                        <!-- Timer Box -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-2.5 text-center">
+                            <span class="text-xs font-bold text-amber-700 uppercase tracking-wider block">Masa Tinggal</span>
+                            <span id="timerDisplay" class="text-3xl font-black font-kids text-amber-600">01:00</span>
+                        </div>
+                        <!-- Score Box -->
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-2.5 text-center">
+                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block">Markah</span>
+                            <span id="scoreDisplay" class="text-3xl font-black font-kids text-emerald-600">0 / 8</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button id="btnStartGame" onclick="startGame()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl shadow-lg hover:from-amber-600 hover:to-orange-600 transition transform hover:-translate-y-0.5 font-kids text-lg">
+                            ▶️ Mula Permainan
+                        </button>
+                        <button onclick="resetGame()" class="px-4 py-3 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-2xl font-bold transition">
+                            🔄 Semula
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Instructional Helper -->
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex items-center space-x-3 text-blue-800 text-sm">
+                    <span class="text-2xl">💡</span>
+                    <p class="font-medium">
+                        <strong>Cara Bermain:</strong> Klik/Tekan kad label minuman di bawah, kemudian tekan kotak kosong pada gambar yang betul. Boleh juga tarik (*drag and drop*) label ke petak jawapan!
+                    </p>
+                </div>
+
+                <!-- Main Game Board Container -->
+                <div id="gameBoard" class="space-y-8 opacity-60 pointer-events-none transition-opacity duration-300">
+                    
+                    <!-- Draggable Labels Pool -->
+                    <div class="bg-white rounded-3xl p-5 card-shadow border border-slate-200">
+                        <h3 class="text-base font-bold text-slate-700 mb-3 flex items-center gap-2">
+                            <span>🏷️</span> Pilihan Label Minuman (Pilih & Padankan)
+                        </h3>
+                        <div id="labelsPool" class="flex flex-wrap gap-3 min-h-[60px] p-2 bg-slate-50 rounded-2xl border border-dashed border-slate-300">
+                            <!-- Draggables injected via JS -->
+                        </div>
+                    </div>
+
+                    <!-- Targets Grid (Visual Images from Worksheet) -->
+                    <div class="bg-white rounded-3xl p-6 card-shadow border border-sky-100">
+                        <h3 class="text-lg font-bold font-kids text-slate-800 mb-4">
+                            🖼️ Gambar Minuman Berkhasiat
+                        </h3>
+                        <div id="imagesGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            <!-- Image Cards with Drop Zones injected via JS -->
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- LEADERBOARD SECTION -->
+            <section class="mt-8 bg-white rounded-3xl p-6 card-shadow border border-amber-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🏆</span>
+                        <div>
+                            <h3 class="text-xl font-bold font-kids text-slate-800">Papan Markah Tertinggi</h3>
+                            <p class="text-xs text-slate-500">Senarai 5 pemain terbaik dengan rekod masa terbanting!</p>
+                        </div>
+                    </div>
+                    <button onclick="clearLeaderboard()" class="text-xs font-semibold text-rose-500 hover:underline">
+                        Padam Rekod
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-xs text-slate-400 uppercase font-bold">
+                                <th class="py-3 px-4">Kedudukan</th>
+                                <th class="py-3 px-4">Nama Murid</th>
+                                <th class="py-3 px-4 text-center">Markah</th>
+                                <th class="py-3 px-4 text-center">Baki Masa</th>
+                                <th class="py-3 px-4 text-right">Tarikh</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody" class="divide-y divide-slate-100 text-sm font-semibold text-slate-700">
+                            <!-- Leaderboard entries injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Dialog for Name Entry on Finish -->
+    <div id="finishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full card-shadow transform transition-all text-center space-y-5">
+            <div class="w-20 h-20 bg-amber-100 text-amber-600 rounded-full flex items-center justify-center text-4xl mx-auto font-kids">
+                🎉
+            </div>
+            <div>
+                <h3 id="modalTitle" class="text-2xl font-bold font-kids text-slate-800">Taniah! Syabas!</h3>
+                <p id="modalSubtext" class="text-slate-600 text-sm mt-1">Anda telah berjaya menyelesaikan semua soalan padanan!</p>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Jumlah Markah:</span>
+                    <span id="finalScoreText" class="font-bold text-emerald-600">8 / 8</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Masa Digunakan:</span>
+                    <span id="finalTimeText" class="font-bold text-amber-600">45 saat</span>
+                </div>
+            </div>
+
+            <div class="text-left space-y-1.5">
+                <label for="studentName" class="text-xs font-bold text-slate-600 uppercase tracking-wider block">Masukkan Nama Anda:</label>
+                <input type="text" id="studentName" placeholder="Contoh: Amir / Sarah" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-amber-500 focus:outline-none font-semibold text-slate-800">
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="saveResultAndClose()" class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md transition font-kids">
+                    💾 Simpan Markah
+                </button>
+                <button onclick="closeModalOnly()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-xs text-slate-500 py-4 border-t border-slate-200/60">
+        <p>© KH Asas Masakan - Permainan Interaktif Minuman Berkhasiat | Reka Bentuk Mesra Murid</p>
+    </footer>
+
+    <script>
+        // Web Audio API Sound Synthesizer (No external dependencies)
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playCorrect() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            },
+            playWrong() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(160, now + 0.12);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            },
+            playWin() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const now = this.ctx.currentTime + (i * 0.1);
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                });
+            }
+        };
+
+        // Data items matching the exact worksheet items
+        const drinksData = [
+            {
+                id: 'lobak_merah',
+                name: 'Jus lobak merah bersusu',
+                bgColor: 'bg-orange-500',
+                lightColor: 'bg-orange-50 border-orange-200',
+                description: 'Lobak merah segar diblend bersusu, kaya dengan Vitamin A.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fff7ed"/>
+                        <path d="M35,35 L65,35 L60,82 C60,86 55,90 50,90 C45,90 40,86 40,82 Z" fill="#fdba74" opacity="0.6"/>
+                        <path d="M38,40 L62,40 L58,80 C58,83 54,86 50,86 C46,86 42,83 42,80 Z" fill="#f97316"/>
+                        <!-- Straw -->
+                        <rect x="58" y="15" width="5" height="40" rx="2" fill="#ef4444" transform="rotate(15 58 15)"/>
+                        <!-- Carrot accent -->
+                        <path d="M22,70 L34,50 L28,75 Z" fill="#ea580c"/>
+                        <path d="M22,70 Q15,65 12,68" stroke="#16a34a" stroke-width="3" fill="none"/>
+                      </svg>`
+            },
+            {
+                id: 'susu_badam',
+                name: 'Jus susu badam',
+                bgColor: 'bg-amber-600',
+                lightColor: 'bg-amber-50 border-amber-200',
+                description: 'Susu lemak manis berkrim disebat bersama badam tinggi protein.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fefce8"/>
+                        <!-- Glass -->
+                        <path d="M35,30 L65,30 L60,85 L40,85 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M37,36 L63,36 L59,82 L41,82 Z" fill="#fef08a" opacity="0.4"/>
+                        <!-- Almond nuts around -->
+                        <ellipse cx="25" cy="75" rx="8" ry="12" fill="#b45309" transform="rotate(-30 25 75)"/>
+                        <ellipse cx="75" cy="78" rx="8" ry="12" fill="#92400e" transform="rotate(30 75 78)"/>
+                        <ellipse cx="68" cy="84" rx="6" ry="10" fill="#78350f" transform="rotate(15 68 84)"/>
+                      </svg>`
+            },
+            {
+                id: 'susu_kurma',
+                name: 'Jus susu kurma',
+                bgColor: 'bg-amber-800',
+                lightColor: 'bg-amber-100 border-amber-300',
+                description: 'Gabungan susu segar dan ekstrak kurma asli memberi tenaga.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fffbebe"/>
+                        <!-- Glass -->
+                        <path d="M36,25 L64,25 L60,85 L40,85 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M38,32 L62,32 L59,82 L41,82 Z" fill="#d97706" opacity="0.7"/>
+                        <!-- Date fruit accents -->
+                        <ellipse cx="25" cy="72" rx="7" ry="12" fill="#451a03" transform="rotate(20 25 72)"/>
+                        <ellipse cx="75" cy="72" rx="7" ry="12" fill="#451a03" transform="rotate(-20 75 72)"/>
+                        <circle cx="50" cy="20" r="4" fill="#78350f"/>
+                      </svg>`
+            },
+            {
+                id: 'avokador',
+                name: 'Jus avokador bersusu',
+                bgColor: 'bg-emerald-600',
+                lightColor: 'bg-emerald-50 border-emerald-200',
+                description: 'Buah avokado segar berkrim dicampur susu yang sangat lazat.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#f0fdf4"/>
+                        <!-- Glass -->
+                        <path d="M35,30 L65,30 L60,85 L40,85 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M37,35 L63,35 L59,82 L41,82 Z" fill="#86efac"/>
+                        <!-- Straw -->
+                        <rect x="42" y="12" width="5" height="45" rx="2" fill="#16a34a" transform="rotate(-10 42 12)"/>
+                        <!-- Avocado Half -->
+                        <ellipse cx="75" cy="70" rx="12" ry="16" fill="#15803d"/>
+                        <ellipse cx="75" cy="70" rx="9" ry="13" fill="#bbf7d0"/>
+                        <circle cx="75" cy="72" r="5" fill="#78350f"/>
+                      </svg>`
+            },
+            {
+                id: 'mangga',
+                name: 'Jus mangga bersusu',
+                bgColor: 'bg-yellow-500',
+                lightColor: 'bg-yellow-50 border-yellow-200',
+                description: 'Mangga harum manis segar diblend bersama susu yang dingin.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fefce8"/>
+                        <!-- Glass -->
+                        <path d="M35,28 L65,28 L58,85 L42,85 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M37,34 L63,34 L57,82 L43,82 Z" fill="#facc15"/>
+                        <!-- Mango cubes -->
+                        <rect x="70" y="65" width="14" height="14" rx="3" fill="#eab308"/>
+                        <rect x="65" y="78" width="12" height="12" rx="3" fill="#ca8a04"/>
+                      </svg>`
+            },
+            {
+                id: 'coklat',
+                name: 'Air coklat',
+                bgColor: 'bg-stone-700',
+                lightColor: 'bg-stone-100 border-stone-300',
+                description: 'Minuman coklat hangat atau dingin bersusu yang memikat rasa.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fafaf9"/>
+                        <!-- Mug Body -->
+                        <rect x="30" y="35" width="40" height="45" rx="8" fill="#ffffff" stroke="#d6d3d1" stroke-width="3"/>
+                        <path d="M70,45 C80,45 80,65 70,65" fill="none" stroke="#d6d3d1" stroke-width="4"/>
+                        <!-- Liquid Top -->
+                        <ellipse cx="50" cy="38" rx="18" ry="6" fill="#78350f"/>
+                        <!-- Pouring stream -->
+                        <path d="M50,10 Q48,20 50,35" stroke="#571c05" stroke-width="5" fill="none"/>
+                      </svg>`
+            },
+            {
+                id: 'tembiakai',
+                name: 'Jus tembiakai bersusu',
+                bgColor: 'bg-rose-500',
+                lightColor: 'bg-rose-50 border-rose-200',
+                description: 'Jus tembikai merah manis yang dipadankan dengan susu manis.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fff1f2"/>
+                        <!-- Glass -->
+                        <path d="M35,30 L65,30 L60,85 L40,85 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M37,35 L63,35 L59,82 L41,82 Z" fill="#fda4af"/>
+                        <!-- Straw -->
+                        <rect x="58" y="12" width="5" height="45" rx="2" fill="#f43f5e" transform="rotate(12 58 12)"/>
+                        <!-- Watermelon Slice -->
+                        <path d="M15,75 A 18 18 0 0 0 35 75 Z" fill="#ef4444"/>
+                        <path d="M13,76 A 20 20 0 0 0 37 76" fill="none" stroke="#15803d" stroke-width="3"/>
+                      </svg>`
+            },
+            {
+                id: 'soya',
+                name: 'Air soya',
+                bgColor: 'bg-yellow-600',
+                lightColor: 'bg-amber-50 border-amber-200',
+                description: 'Minuman ekstrak kacang soya asli berkalsium tinggi dan sihat.',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full">
+                        <rect x="0" y="0" width="100" height="100" fill="#fefce8"/>
+                        <!-- Glass -->
+                        <path d="M35,30 L65,30 L60,85 L40,85 Z" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+                        <path d="M37,35 L63,35 L59,82 L41,82 Z" fill="#fef08a" opacity="0.6"/>
+                        <!-- Soybeans scattered -->
+                        <circle cx="25" cy="78" r="5" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+                        <circle cx="35" cy="84" r="5" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+                        <circle cx="68" cy="82" r="5" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+                        <circle cx="76" cy="76" r="4.5" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+                      </svg>`
+            }
+        ];
+
+        // State variables
+        let gameActive = false;
+        let timerInterval = null;
+        let timeRemaining = 60; // 1 minute
+        let score = 0;
+        let selectedLabelId = null;
+        let matchedPairs = {};
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderStudyCards();
+            renderGameBoard();
+            loadLeaderboard();
+        });
+
+        function switchTab(tabName) {
+            const studySec = document.getElementById('studySection');
+            const gameSec = document.getElementById('gameSection');
+            const btnStudy = document.getElementById('btnStudyTab');
+            const btnGame = document.getElementById('btnGameTab');
+
+            if (tabName === 'study') {
+                studySec.classList.remove('hidden');
+                gameSec.classList.add('hidden');
+                btnStudy.className = "px-4 py-2 rounded-xl text-sm font-bold bg-sky-500 text-white shadow-md hover:bg-sky-600 transition";
+                btnGame.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
+            } else {
+                studySec.classList.add('hidden');
+                gameSec.classList.remove('hidden');
+                btnGame.className = "px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-white shadow-md hover:bg-amber-600 transition";
+                btnStudy.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
+            }
+        }
+
+        function renderStudyCards() {
+            const container = document.getElementById('studyGrid');
+            container.innerHTML = drinksData.map(item => `
+                <div class="bg-white rounded-2xl border border-slate-100 p-4 card-shadow hover:shadow-lg transition flex flex-col justify-between">
+                    <div>
+                        <div class="w-full h-40 rounded-xl overflow-hidden mb-3 border border-slate-100">
+                            ${item.svg}
+                        </div>
+                        <span class="inline-block px-2.5 py-1 ${item.bgColor} text-white rounded-lg text-xs font-bold font-kids mb-1">
+                            ${item.name}
+                        </span>
+                        <p class="text-xs text-slate-500 mt-1 leading-relaxed">${item.description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderGameBoard() {
+            // Render Draggable Labels Pool (shuffled)
+            const pool = document.getElementById('labelsPool');
+            const shuffledLabels = [...drinksData].sort(() => Math.random() - 0.5);
+
+            pool.innerHTML = shuffledLabels.map(item => `
+                <div id="label-${item.id}" 
+                     draggable="true" 
+                     ondragstart="handleDragStart(event, '${item.id}')"
+                     onclick="handleLabelClick('${item.id}')"
+                     class="draggable-item bg-white border-2 border-sky-400 text-sky-900 px-4 py-2.5 rounded-2xl font-bold font-kids text-sm cursor-pointer shadow-sm hover:bg-sky-50 flex items-center gap-2">
+                    <span>🏷️</span>
+                    <span>${item.name}</span>
+                </div>
+            `).join('');
+
+            // Render Images Grid with Drop Zones
+            const grid = document.getElementById('imagesGrid');
+            // Shuffle images order to keep game fresh
+            const shuffledImages = [...drinksData].sort(() => Math.random() - 0.5);
+
+            grid.innerHTML = shuffledImages.map(item => `
+                <div class="bg-slate-50 rounded-2xl border border-slate-200 p-4 card-shadow flex flex-col items-center justify-between space-y-3">
+                    <div class="w-full h-44 rounded-xl overflow-hidden border border-slate-200 bg-white shadow-inner">
+                        ${item.svg}
+                    </div>
+                    
+                    <!-- Drop zone container -->
+                    <div id="dropzone-${item.id}" 
+                         ondragover="handleDragOver(event)" 
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, '${item.id}')"
+                         onclick="handleZoneClick('${item.id}')"
+                         class="drop-zone w-full min-h-[50px] border-2 border-dashed border-slate-300 rounded-xl bg-white flex items-center justify-center p-2 text-center cursor-pointer">
+                        <span id="dropzone-text-${item.id}" class="text-xs text-slate-400 font-semibold">
+                            Sila letak label di sini
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function startGame() {
+            if (gameActive) return;
+
+            AudioFX.init();
+            gameActive = true;
+            score = 0;
+            timeRemaining = 60;
+            matchedPairs = {};
+            selectedLabelId = null;
+
+            document.getElementById('scoreDisplay').innerText = `0 / ${drinksData.length}`;
+            document.getElementById('timerDisplay').innerText = `01:00`;
+            document.getElementById('timerDisplay').classList.remove('pulse-timer');
+            
+            const board = document.getElementById('gameBoard');
+            board.classList.remove('opacity-60', 'pointer-events-none');
+
+            document.getElementById('btnStartGame').innerText = "⏳ Bermain...";
+            document.getElementById('btnStartGame').disabled = true;
+
+            renderGameBoard();
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 0) {
+                    endGame(false);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            const timerElem = document.getElementById('timerDisplay');
+            timerElem.innerText = formatted;
+
+            if (timeRemaining <= 10) {
+                timerElem.classList.add('pulse-timer');
+            }
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            gameActive = false;
+            timeRemaining = 60;
+            score = 0;
+            matchedPairs = {};
+            selectedLabelId = null;
+
+            document.getElementById('timerDisplay').innerText = "01:00";
+            document.getElementById('timerDisplay').classList.remove('pulse-timer');
+            document.getElementById('scoreDisplay').innerText = `0 / ${drinksData.length}`;
+            
+            const board = document.getElementById('gameBoard');
+            board.classList.add('opacity-60', 'pointer-events-none');
+
+            const btnStart = document.getElementById('btnStartGame');
+            btnStart.innerText = "▶️ Mula Permainan";
+            btnStart.disabled = false;
+
+            renderGameBoard();
+        }
+
+        // Matching Logic (Supports Drag & Drop AND Click/Tap)
+        function handleLabelClick(id) {
+            if (!gameActive) return;
+
+            // Clear previous selections
+            document.querySelectorAll('.draggable-item').forEach(el => el.classList.remove('selected'));
+
+            if (selectedLabelId === id) {
+                selectedLabelId = null; // deselect
+            } else {
+                selectedLabelId = id;
+                const activeElem = document.getElementById(`label-${id}`);
+                if (activeElem) activeElem.classList.add('selected');
+            }
+        }
+
+        function handleZoneClick(targetId) {
+            if (!gameActive) return;
+            if (matchedPairs[targetId]) return; // already solved
+
+            if (selectedLabelId) {
+                evaluateMatch(selectedLabelId, targetId);
+                selectedLabelId = null;
+                document.querySelectorAll('.draggable-item').forEach(el => el.classList.remove('selected'));
+            }
+        }
+
+        // HTML5 Drag & Drop API Handlers
+        function handleDragStart(e, id) {
+            if (!gameActive) {
+                e.preventDefault();
+                return;
+            }
+            e.dataTransfer.setData('text/plain', id);
+        }
+
+        function handleDragOver(e) {
+            if (!gameActive) return;
+            e.preventDefault();
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e, targetId) {
+            if (!gameActive) return;
+            e.preventDefault();
+            const dropzone = e.currentTarget;
+            dropzone.classList.remove('drag-over');
+
+            const draggedId = e.dataTransfer.getData('text/plain');
+            if (draggedId) {
+                evaluateMatch(draggedId, targetId);
+            }
+        }
+
+        function evaluateMatch(labelId, targetId) {
+            const labelElem = document.getElementById(`label-${labelId}`);
+            const dropzoneElem = document.getElementById(`dropzone-${targetId}`);
+
+            if (labelId === targetId) {
+                // Correct Match
+                AudioFX.playCorrect();
+                score++;
+                matchedPairs[targetId] = true;
+
+                document.getElementById('scoreDisplay').innerText = `${score} / ${drinksData.length}`;
+
+                // Update Drop Zone UI
+                dropzoneElem.classList.add('correct');
+                const matchedItem = drinksData.find(d => d.id === targetId);
+                dropzoneElem.innerHTML = `
+                    <div class="flex items-center gap-1.5 font-bold font-kids text-emerald-800 text-sm">
+                        <span>✅</span>
+                        <span>${matchedItem.name}</span>
+                    </div>
+                `;
+
+                // Remove label from pool
+                if (labelElem) labelElem.remove();
+
+                // Check Win condition
+                if (score === drinksData.length) {
+                    endGame(true);
+                }
+            } else {
+                // Incorrect Match
+                AudioFX.playWrong();
+                dropzoneElem.classList.add('wrong');
+                setTimeout(() => {
+                    dropzoneElem.classList.remove('wrong');
+                }, 500);
+            }
+        }
+
+        function endGame(isWin) {
+            clearInterval(timerInterval);
+            gameActive = false;
+
+            const timeUsed = 60 - timeRemaining;
+            const btnStart = document.getElementById('btnStartGame');
+            btnStart.innerText = "▶️ Mula Permainan";
+            btnStart.disabled = false;
+
+            if (isWin) {
+                AudioFX.playWin();
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+
+                document.getElementById('modalTitle').innerText = "🎉 Syabas & Tahniah!";
+                document.getElementById('modalSubtext').innerText = "Anda berjaya memadankan semua minuman berkhasiat!";
+            } else {
+                document.getElementById('modalTitle').innerText = "⏰ Masa Tamat!";
+                document.getElementById('modalSubtext').innerText = "Cuba lagi untuk meningkatkan kepantasan anda!";
+            }
+
+            document.getElementById('finalScoreText').innerText = `${score} / ${drinksData.length}`;
+            document.getElementById('finalTimeText').innerText = `${timeUsed} saat`;
+
+            document.getElementById('finishModal').classList.remove('hidden');
+        }
+
+        // Leaderboard Management via localStorage
+        function saveResultAndClose() {
+            const nameInput = document.getElementById('studentName');
+            const studentName = nameInput.value.trim() || 'Murid Comel';
+            const timeUsed = 60 - timeRemaining;
+
+            const newEntry = {
+                name: studentName,
+                score: score,
+                timeRemaining: timeRemaining,
+                timeUsed: timeUsed,
+                date: new Date().toLocaleDateString('ms-MY')
+            };
+
+            let leaderboard = JSON.parse(localStorage.getItem('kh_minuman_leaderboard') || '[]');
+            leaderboard.push(newEntry);
+
+            // Sort: highest score first, then highest timeRemaining (fastest time)
+            leaderboard.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return b.timeRemaining - a.timeRemaining;
+            });
+
+            // Keep top 5
+            leaderboard = leaderboard.slice(0, 5);
+            localStorage.setItem('kh_minuman_leaderboard', JSON.stringify(leaderboard));
+
+            nameInput.value = '';
+            document.getElementById('finishModal').classList.add('hidden');
+            loadLeaderboard();
+        }
+
+        function closeModalOnly() {
+            document.getElementById('finishModal').classList.add('hidden');
+        }
+
+        function loadLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            const leaderboard = JSON.parse(localStorage.getItem('kh_minuman_leaderboard') || '[]');
+
+            if (leaderboard.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-slate-400 italic">
+                            Belum ada rekod. Jadi yang pertama menyertai cabaran!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const medalIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+            tbody.innerHTML = leaderboard.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-3 px-4 font-bold text-base">${medalIcons[idx] || idx + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${escapeHtml(item.name)}</td>
+                    <td class="py-3 px-4 text-center font-bold text-emerald-600">${item.score} / ${drinksData.length}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-amber-600">${item.timeRemaining}s baki</td>
+                    <td class="py-3 px-4 text-right text-xs text-slate-400">${item.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearLeaderboard() {
+            if (confirm("Adakah anda pasti mahu memadam semua rekod papan markah?")) {
+                localStorage.removeItem('kh_minuman_leaderboard');
+                loadLeaderboard();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+
+        // Download Self-contained Game File
+        function downloadGameOffline() {
+            const currentHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([currentHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "Game_Minuman_Berkhasiat_KH.html";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
