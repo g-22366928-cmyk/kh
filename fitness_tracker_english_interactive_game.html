@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Reading Comprehension - Fitness Tracker</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti for victory celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Fonts: Fredoka & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #fef3c7 100%);
+            min-height: 100vh;
+        }
+        .font-kids {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .card-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+        }
+        .pulse-timer {
+            animation: pulse-red 0.8s infinite alternate;
+        }
+        @keyframes pulse-red {
+            0% { color: #dc2626; transform: scale(1); }
+            100% { color: #991b1b; transform: scale(1.08); }
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        .option-btn:hover {
+            transform: translateY(-2px);
+        }
+        .option-btn.selected {
+            border-color: #0284c7;
+            background-color: #e0f2fe;
+        }
+    </style>
+</head>
+<body class="text-slate-800 pb-12 min-h-screen flex flex-col justify-between">
+
+    <div>
+        <header class="bg-white/90 backdrop-blur-md border-b border-sky-100 sticky top-0 z-30 shadow-sm">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center space-x-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-blue-600 flex items-center justify-center text-white text-2xl shadow-md font-bold font-kids">
+                        ⌚
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold font-kids text-slate-800 leading-tight">English Reading Activity</h1>
+                        <p class="text-xs md:text-sm font-semibold text-sky-600">Topic: Fitness Tracker 🏃‍♂️</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Tabs & Actions -->
+                <div class="flex items-center space-x-2">
+                    <button id="btnStudyTab" onclick="switchTab('study')" class="px-4 py-2 rounded-xl text-sm font-bold bg-sky-500 text-white shadow-md hover:bg-sky-600 transition">
+                        📖 Study Mode
+                    </button>
+                    <button id="btnGameTab" onclick="switchTab('game')" class="px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-white shadow-md hover:bg-amber-600 transition">
+                        ⚡ 1-Minute Challenge
+                    </button>
+                    <button onclick="downloadGameOffline()" class="px-4 py-2 rounded-xl text-sm font-bold bg-emerald-600 text-white shadow-md hover:bg-emerald-700 transition flex items-center gap-1.5" title="Download offline game file">
+                        <span>📥</span> <span class="hidden sm:inline">Download</span> Game
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <main class="max-w-6xl mx-auto px-4 mt-6">
+
+            <!-- TAB 1: STUDY MODE -->
+            <section id="studySection" class="block space-y-6">
+                <div class="bg-white rounded-3xl p-6 md:p-8 card-shadow border border-sky-100 space-y-6">
+                    
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                        <div>
+                            <span class="px-3 py-1 bg-sky-100 text-sky-800 rounded-full text-xs font-bold uppercase tracking-wide">Reading Passage</span>
+                            <h2 class="text-2xl md:text-3xl font-bold font-kids text-slate-800 mt-1">Fitness Tracker ⌚</h2>
+                            <p class="text-slate-500 text-sm mt-1">Read the article below carefully before starting the 1-minute comprehension challenge.</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="speakText()" class="px-4 py-2.5 bg-sky-50 text-sky-700 hover:bg-sky-100 rounded-xl font-bold text-sm border border-sky-200 transition flex items-center gap-2">
+                                🔊 Listen Passage
+                            </button>
+                            <button onclick="switchTab('game')" class="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl shadow-lg hover:from-amber-600 hover:to-orange-600 transition font-kids">
+                                Start Quiz 🚀
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Article Passage Card -->
+                    <div class="bg-gradient-to-br from-amber-50/60 to-orange-50/40 border border-amber-200/80 rounded-2xl p-6 leading-relaxed text-slate-700 space-y-4 shadow-inner text-base md:text-lg">
+                        <p>
+                            An <strong class="text-sky-700 bg-sky-100 px-1.5 py-0.5 rounded">activity tracker</strong>, also known as a <strong class="text-sky-700 bg-sky-100 px-1.5 py-0.5 rounded">fitness tracker</strong>, is a <strong class="text-amber-800 underline decoration-amber-400">device</strong> or application for tracking and monitoring individual fitness-related metrics such as distance walked or run, calorie consumption, heartbeat and in some cases oxygen level in our blood.
+                        </p>
+                        <p>
+                            The function of this tracker is to watch and record your daily heart rate, burnt calories and number of steps taken. In addition, it allows you to stick to a healthier diet. Regular use of the fitness tracker <strong class="text-amber-800 underline decoration-amber-400">boosts</strong> our daily workout and makes them achievable.
+                        </p>
+                        <p>
+                            How does a tracker measure our steps? It can sense the movements of our body. The data is recorded the whole time it is <strong class="text-amber-800 underline decoration-amber-400">wearable</strong> and powered up, which enables the tracker to trace if the individual is walking forward, running fast or even standing still. This tracker helps setting in individual fitness goals such as burning calories, drinking a set number of glasses of water and many more.
+                        </p>
+                    </div>
+
+                    <!-- Glossary Box -->
+                    <div class="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-5 space-y-3">
+                        <div class="flex items-center gap-2 text-emerald-800 font-bold font-kids text-lg">
+                            <span>🚀</span>
+                            <h3>Glossary</h3>
+                        </div>
+                        <ul class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                            <li class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm">
+                                <span class="font-bold text-emerald-700 block">Device:</span>
+                                <span class="text-slate-600">A piece of mechanical or electronic equipment.</span>
+                            </li>
+                            <li class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm">
+                                <span class="font-bold text-emerald-700 block">Boosts:</span>
+                                <span class="text-slate-600">Helps to encourage or increase actions.</span>
+                            </li>
+                            <li class="bg-white p-3 rounded-xl border border-emerald-100 shadow-sm">
+                                <span class="font-bold text-emerald-700 block">Wearable:</span>
+                                <span class="text-slate-600">Very easy to wear / Easy to be worn on body.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- TAB 2: GAME MODE (1-MINUTE CHALLENGE) -->
+            <section id="gameSection" class="hidden space-y-6">
+                
+                <!-- Status Bar -->
+                <div class="bg-white rounded-3xl p-5 card-shadow border border-sky-100 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-6">
+                        <!-- Timer Box -->
+                        <div class="bg-amber-50 border border-amber-200 rounded-2xl px-5 py-2.5 text-center">
+                            <span class="text-xs font-bold text-amber-700 uppercase tracking-wider block">Time Left</span>
+                            <span id="timerDisplay" class="text-3xl font-black font-kids text-amber-600">01:00</span>
+                        </div>
+                        <!-- Score Box -->
+                        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-2.5 text-center">
+                            <span class="text-xs font-bold text-emerald-700 uppercase tracking-wider block">Score</span>
+                            <span id="scoreDisplay" class="text-3xl font-black font-kids text-emerald-600">0 / 5</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <button id="btnStartGame" onclick="startGame()" class="px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-2xl shadow-lg hover:from-amber-600 hover:to-orange-600 transition font-kids text-lg">
+                            ▶️ Start 1-Min Challenge
+                        </button>
+                        <button onclick="resetGame()" class="px-4 py-3 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded-2xl font-bold transition">
+                            🔄 Reset
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Helper Banner -->
+                <div class="bg-sky-50 border border-sky-200 rounded-2xl p-4 flex items-center space-x-3 text-sky-900 text-sm">
+                    <span class="text-2xl">💡</span>
+                    <p class="font-medium">
+                        <strong>Instructions:</strong> Press <strong>Start 1-Min Challenge</strong> to begin! Answer all 5 comprehension questions based on the Fitness Tracker reading passage before time runs out.
+                    </p>
+                </div>
+
+                <!-- Quiz Container -->
+                <div id="gameBoard" class="opacity-60 pointer-events-none transition-opacity duration-300 space-y-6">
+                    <div id="quizContainer" class="bg-white rounded-3xl p-6 md:p-8 card-shadow border border-sky-100 space-y-6">
+                        <!-- Quiz Questions render dynamically via JS -->
+                    </div>
+
+                    <div class="text-center pt-2">
+                        <button id="btnSubmitQuiz" onclick="submitQuiz()" class="px-8 py-3.5 bg-emerald-600 text-white font-bold rounded-2xl shadow-lg hover:bg-emerald-700 transition font-kids text-lg hidden">
+                            ✅ Submit Answers
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- LEADERBOARD SECTION -->
+            <section class="mt-8 bg-white rounded-3xl p-6 card-shadow border border-sky-100">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-3xl">🏆</span>
+                        <div>
+                            <h3 class="text-xl font-bold font-kids text-slate-800">Top Students Leaderboard</h3>
+                            <p class="text-xs text-slate-500">Top 5 highest scoring students with fastest times!</p>
+                        </div>
+                    </div>
+                    <button onclick="clearLeaderboard()" class="text-xs font-semibold text-rose-500 hover:underline">
+                        Clear Records
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-xs text-slate-400 uppercase font-bold">
+                                <th class="py-3 px-4">Rank</th>
+                                <th class="py-3 px-4">Student Name</th>
+                                <th class="py-3 px-4 text-center">Score</th>
+                                <th class="py-3 px-4 text-center">Time Left</th>
+                                <th class="py-3 px-4 text-right">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="leaderboardBody" class="divide-y divide-slate-100 text-sm font-semibold text-slate-700">
+                            <!-- Leaderboard entries injected via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal Dialog for Name Entry on Finish -->
+    <div id="finishModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 md:p-8 max-w-md w-full card-shadow transform transition-all text-center space-y-5">
+            <div class="w-20 h-20 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center text-4xl mx-auto font-kids">
+                🎉
+            </div>
+            <div>
+                <h3 id="modalTitle" class="text-2xl font-bold font-kids text-slate-800">Great Job!</h3>
+                <p id="modalSubtext" class="text-slate-600 text-sm mt-1">You have completed the Fitness Tracker comprehension challenge!</p>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 text-left space-y-2">
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Total Score:</span>
+                    <span id="finalScoreText" class="font-bold text-emerald-600">5 / 5</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-slate-500">Time Taken:</span>
+                    <span id="finalTimeText" class="font-bold text-amber-600">42 seconds</span>
+                </div>
+            </div>
+
+            <div class="text-left space-y-1.5">
+                <label for="studentName" class="text-xs font-bold text-slate-600 uppercase tracking-wider block">Enter Your Name:</label>
+                <input type="text" id="studentName" placeholder="e.g. Adam / Sarah" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-sky-500 focus:outline-none font-semibold text-slate-800">
+            </div>
+
+            <div class="flex gap-3 pt-2">
+                <button onclick="saveResultAndClose()" class="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl shadow-md transition font-kids">
+                    💾 Save Result
+                </button>
+                <button onclick="closeModalOnly()" class="px-4 py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="mt-12 text-center text-xs text-slate-500 py-4 border-t border-slate-200/60">
+        <p>© English Reading Activity - Fitness Tracker Interactive Learning Module</p>
+    </footer>
+
+    <script>
+        // Web Audio API Sound Synthesizer (No external file dependencies)
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+            },
+            playCorrect() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(523.25, now); // C5
+                osc.frequency.exponentialRampToValueAtTime(659.25, now + 0.1); // E5
+                osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2); // G5
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.35);
+            },
+            playWrong() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const now = this.ctx.currentTime;
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(220, now);
+                osc.frequency.setValueAtTime(160, now + 0.12);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+                osc.start(now);
+                osc.stop(now + 0.3);
+            },
+            playWin() {
+                this.init();
+                if (this.ctx.state === 'suspended') this.ctx.resume();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, i) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const now = this.ctx.currentTime + (i * 0.1);
+                    osc.type = 'sine';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                });
+            }
+        };
+
+        // Questions based on Section C of worksheet
+        const quizData = [
+            {
+                id: 'q1',
+                question: '1. What is a fitness tracker?',
+                options: [
+                    'A device or application for tracking and monitoring individual fitness-related metrics.',
+                    'A type of footwear used for running fast in marathon races.',
+                    'A special television set designed for watching sports games.',
+                    'A camera used solely to record videos of people exercising.'
+                ],
+                correct: 0
+            },
+            {
+                id: 'q2',
+                question: '2. Which of the following is NOT a function of a fitness tracker based on the article?',
+                options: [
+                    'Watch and record daily heart rate',
+                    'Record burnt calories and number of steps taken',
+                    'Automatically cook healthy meals for your family',
+                    'Allow user to stick to a healthier diet'
+                ],
+                correct: 2
+            },
+            {
+                id: 'q3',
+                question: '3. How does a tracker measure our steps taken?',
+                options: [
+                    'It takes photographs of your shoes every minute.',
+                    'It can sense the movements of our body.',
+                    'It counts the sound of your footsteps using a microphone.',
+                    'It sends GPS signals to a satellite continuously.'
+                ],
+                correct: 1
+            },
+            {
+                id: 'q4',
+                question: '4. What does the word "Boosts" mean in the glossary?',
+                options: [
+                    'Very easy to wear on the wrist.',
+                    'A piece of mechanical or electronic equipment.',
+                    'Helps to encourage or increase actions.',
+                    'To reduce daily physical activity.'
+                ],
+                correct: 2
+            },
+            {
+                id: 'q5',
+                question: '5. Which individual fitness goals can a fitness tracker help set?',
+                options: [
+                    'Burning calories and drinking a set number of glasses of water.',
+                    'Playing computer video games for 10 hours continuously.',
+                    'Sleeping all day without moving.',
+                    'Buying expensive sports clothes every week.'
+                ],
+                correct: 0
+            }
+        ];
+
+        // State variables
+        let gameActive = false;
+        let timerInterval = null;
+        let timeRemaining = 60; // 1 minute
+        let userAnswers = {};
+        let score = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderQuiz();
+            loadLeaderboard();
+        });
+
+        function switchTab(tabName) {
+            const studySec = document.getElementById('studySection');
+            const gameSec = document.getElementById('gameSection');
+            const btnStudy = document.getElementById('btnStudyTab');
+            const btnGame = document.getElementById('btnGameTab');
+
+            if (tabName === 'study') {
+                studySec.classList.remove('hidden');
+                gameSec.classList.add('hidden');
+                btnStudy.className = "px-4 py-2 rounded-xl text-sm font-bold bg-sky-500 text-white shadow-md hover:bg-sky-600 transition";
+                btnGame.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
+            } else {
+                studySec.classList.add('hidden');
+                gameSec.classList.remove('hidden');
+                btnGame.className = "px-4 py-2 rounded-xl text-sm font-bold bg-amber-500 text-white shadow-md hover:bg-amber-600 transition";
+                btnStudy.className = "px-4 py-2 rounded-xl text-sm font-bold bg-slate-200 text-slate-700 hover:bg-slate-300 transition";
+            }
+        }
+
+        function speakText() {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const text = "Fitness Tracker. An activity tracker, also known as a fitness tracker, is a device or application for tracking and monitoring individual fitness-related metrics such as distance walked or run, calorie consumption, heartbeat and in some cases oxygen level in our blood. The function of this tracker is to watch and record your daily heart rate, burnt calories and number of steps taken.";
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US';
+                utterance.rate = 0.9;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert("Text-to-speech is not supported on this browser.");
+            }
+        }
+
+        function renderQuiz() {
+            const container = document.getElementById('quizContainer');
+            container.innerHTML = quizData.map((q, qIndex) => `
+                <div class="space-y-3 pb-4 border-b border-slate-100 last:border-b-0">
+                    <h4 class="font-bold text-slate-800 text-base md:text-lg">${q.question}</h4>
+                    <div class="grid grid-cols-1 gap-2.5">
+                        ${q.options.map((opt, optIndex) => `
+                            <button id="opt-${qIndex}-${optIndex}" 
+                                    onclick="selectOption(${qIndex}, ${optIndex})"
+                                    class="option-btn text-left p-3.5 rounded-xl border-2 border-slate-200 hover:border-sky-300 bg-white font-medium text-slate-700 text-sm md:text-base flex items-start gap-3">
+                                <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">
+                                    ${String.fromCharCode(65 + optIndex)}
+                                </span>
+                                <span>${opt}</span>
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function selectOption(qIndex, optIndex) {
+            if (!gameActive) return;
+
+            userAnswers[qIndex] = optIndex;
+
+            // Highlight selected button UI
+            quizData[qIndex].options.forEach((_, idx) => {
+                const btn = document.getElementById(`opt-${qIndex}-${idx}`);
+                if (btn) {
+                    btn.classList.remove('selected', 'border-sky-500', 'bg-sky-50');
+                    btn.classList.add('border-slate-200');
+                }
+            });
+
+            const selectedBtn = document.getElementById(`opt-${qIndex}-${optIndex}`);
+            if (selectedBtn) {
+                selectedBtn.classList.add('selected', 'border-sky-500', 'bg-sky-50');
+            }
+        }
+
+        function startGame() {
+            if (gameActive) return;
+
+            AudioFX.init();
+            gameActive = true;
+            score = 0;
+            timeRemaining = 60;
+            userAnswers = {};
+
+            document.getElementById('scoreDisplay').innerText = `0 / ${quizData.length}`;
+            document.getElementById('timerDisplay').innerText = `01:00`;
+            document.getElementById('timerDisplay').classList.remove('pulse-timer');
+            
+            const board = document.getElementById('gameBoard');
+            board.classList.remove('opacity-60', 'pointer-events-none');
+
+            document.getElementById('btnSubmitQuiz').classList.remove('hidden');
+
+            document.getElementById('btnStartGame').innerText = "⏳ In Progress...";
+            document.getElementById('btnStartGame').disabled = true;
+
+            renderQuiz();
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 0) {
+                    submitQuiz();
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const mins = Math.floor(timeRemaining / 60);
+            const secs = timeRemaining % 60;
+            const formatted = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            const timerElem = document.getElementById('timerDisplay');
+            timerElem.innerText = formatted;
+
+            if (timeRemaining <= 10) {
+                timerElem.classList.add('pulse-timer');
+            }
+        }
+
+        function submitQuiz() {
+            if (!gameActive) return;
+
+            clearInterval(timerInterval);
+            gameActive = false;
+
+            // Calculate score
+            score = 0;
+            quizData.forEach((q, qIndex) => {
+                const selected = userAnswers[qIndex];
+                if (selected === q.correct) {
+                    score++;
+                }
+
+                // Show visual feedback on answers
+                q.options.forEach((_, optIdx) => {
+                    const btn = document.getElementById(`opt-${qIndex}-${optIdx}`);
+                    if (btn) {
+                        if (optIdx === q.correct) {
+                            btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-900');
+                        } else if (selected === optIdx) {
+                            btn.classList.add('bg-rose-100', 'border-rose-500', 'text-rose-900');
+                        }
+                    }
+                });
+            });
+
+            document.getElementById('scoreDisplay').innerText = `${score} / ${quizData.length}`;
+
+            const timeUsed = 60 - timeRemaining;
+            const btnStart = document.getElementById('btnStartGame');
+            btnStart.innerText = "▶️ Start 1-Min Challenge";
+            btnStart.disabled = false;
+
+            if (score >= 4) {
+                AudioFX.playWin();
+                confetti({
+                    particleCount: 100,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                document.getElementById('modalTitle').innerText = "🎉 Excellent Work!";
+                document.getElementById('modalSubtext').innerText = "You demonstrated high reading comprehension!";
+            } else {
+                AudioFX.playWrong();
+                document.getElementById('modalTitle').innerText = "👍 Good Attempt!";
+                document.getElementById('modalSubtext').innerText = "Review the reading passage and try again to get a perfect score!";
+            }
+
+            document.getElementById('finalScoreText').innerText = `${score} / ${quizData.length}`;
+            document.getElementById('finalTimeText').innerText = `${timeUsed} seconds`;
+
+            document.getElementById('finishModal').classList.remove('hidden');
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            gameActive = false;
+            timeRemaining = 60;
+            score = 0;
+            userAnswers = {};
+
+            document.getElementById('timerDisplay').innerText = "01:00";
+            document.getElementById('timerDisplay').classList.remove('pulse-timer');
+            document.getElementById('scoreDisplay').innerText = `0 / ${quizData.length}`;
+            
+            const board = document.getElementById('gameBoard');
+            board.classList.add('opacity-60', 'pointer-events-none');
+
+            document.getElementById('btnSubmitQuiz').classList.add('hidden');
+
+            const btnStart = document.getElementById('btnStartGame');
+            btnStart.innerText = "▶️ Start 1-Min Challenge";
+            btnStart.disabled = false;
+
+            renderQuiz();
+        }
+
+        function saveResultAndClose() {
+            const nameInput = document.getElementById('studentName');
+            const studentName = nameInput.value.trim() || 'Smart Student';
+            const timeUsed = 60 - timeRemaining;
+
+            const newEntry = {
+                name: studentName,
+                score: score,
+                timeRemaining: timeRemaining,
+                timeUsed: timeUsed,
+                date: new Date().toLocaleDateString('en-GB')
+            };
+
+            let leaderboard = JSON.parse(localStorage.getItem('english_fitness_tracker_leaderboard') || '[]');
+            leaderboard.push(newEntry);
+
+            leaderboard.sort((a, b) => {
+                if (b.score !== a.score) return b.score - a.score;
+                return b.timeRemaining - a.timeRemaining;
+            });
+
+            leaderboard = leaderboard.slice(0, 5);
+            localStorage.setItem('english_fitness_tracker_leaderboard', JSON.stringify(leaderboard));
+
+            nameInput.value = '';
+            document.getElementById('finishModal').classList.add('hidden');
+            loadLeaderboard();
+        }
+
+        function closeModalOnly() {
+            document.getElementById('finishModal').classList.add('hidden');
+        }
+
+        function loadLeaderboard() {
+            const tbody = document.getElementById('leaderboardBody');
+            const leaderboard = JSON.parse(localStorage.getItem('english_fitness_tracker_leaderboard') || '[]');
+
+            if (leaderboard.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="py-6 text-center text-slate-400 italic">
+                            No records yet. Be the first to complete the challenge!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            const medalIcons = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
+
+            tbody.innerHTML = leaderboard.map((item, idx) => `
+                <tr class="hover:bg-slate-50 transition">
+                    <td class="py-3 px-4 font-bold text-base">${medalIcons[idx] || idx + 1}</td>
+                    <td class="py-3 px-4 font-bold text-slate-800">${escapeHtml(item.name)}</td>
+                    <td class="py-3 px-4 text-center font-bold text-emerald-600">${item.score} / ${quizData.length}</td>
+                    <td class="py-3 px-4 text-center font-semibold text-amber-600">${item.timeRemaining}s left</td>
+                    <td class="py-3 px-4 text-right text-xs text-slate-400">${item.date}</td>
+                </tr>
+            `).join('');
+        }
+
+        function clearLeaderboard() {
+            if (confirm("Are you sure you want to clear all leaderboard records?")) {
+                localStorage.removeItem('english_fitness_tracker_leaderboard');
+                loadLeaderboard();
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.innerText = text;
+            return div.innerHTML;
+        }
+
+        function downloadGameOffline() {
+            const currentHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([currentHtml], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = "English_Fitness_Tracker_Interactive_Game.html";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
